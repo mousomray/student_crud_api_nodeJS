@@ -10,7 +10,7 @@ connectDB()
 app.use(express.json()); // use Express
 app.use((cors())); // Use Cors 
 
-//For API Routing 
+//Mother API Routing 
 const allrouter = require('./app/router/allrouter');
 app.use('/api', allrouter);
 
