@@ -37,8 +37,8 @@ class allcontroller {
 
     // Get Single 
     async getsingle(req, res) {
+        const id = req.params.id;
         try {
-            const id = req.params.id;
             const data = await Student.findById(id);
             if (data) {
                 res.status(200).json(data);
@@ -53,11 +53,9 @@ class allcontroller {
 
     // Update Data
     async studentupdate(req, res) {
+        const id = req.params.id;
         try {
-            const updatedStudent = await Student.findByIdAndUpdate(
-                req.params.id,
-                req.body,
-                { new: true, runValidators: true }
+            const updatedStudent = await Student.findByIdAndUpdate(id, req.body, { new: true, runValidators: true }
             );
             if (!updatedStudent) return res.status(404).json({ message: "Student not found" });
             res.status(200).json({ message: "Student updated successfully", data: updatedStudent });
@@ -74,8 +72,9 @@ class allcontroller {
 
     // Delete Student
     async studentdelete(req, res) {
+        const id = req.params.id;
         try {
-            const deletedStudent = await Student.findByIdAndDelete(req.params.id);
+            const deletedStudent = await Student.findByIdAndDelete(id);
             res.status(deletedStudent ? 200 : 404).json(
                 deletedStudent ? { message: "Student deleted successfully" } : { message: "Student not found" }
             );
