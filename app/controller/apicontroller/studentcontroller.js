@@ -1,13 +1,20 @@
-const Student = require('../model/student');
+const Student = require('../../model/student');
 
-class allcontroller {
+class studentcontroller {
 
     // Create API 
     async create(req, res) {
         try {
-            const studentdata = new Student(req.body);
+            // This code is for uploading image with validation
+            if (!req.file) {
+                return res.status(400).json({
+                    message: "Validation error",
+                    errors: ["Please enter student image it is required"]
+                });
+            }
+            const studentdata = new Student({ ...req.body, image: req.file.path }); // Assign the image path for validation
             const data = await studentdata.save();
-            res.status(200).json({ message: "Data added successfully", data });
+            res.status(200).json({ message: "Student added successfully", data });
         } catch (error) {
             const statusCode = error.name === 'ValidationError' ? 400 : 500;
             const message = error.name === 'ValidationError'
@@ -25,7 +32,7 @@ class allcontroller {
         try {
             const data = await Student.find()
             res.status(200).json({
-                message: "Data get successfully",
+                message: "Student get successfully",
                 total: data.length,
                 students: data
             })
@@ -57,7 +64,14 @@ class allcontroller {
         try {
             const updatedStudent = await Student.findByIdAndUpdate(id, req.body, { new: true, runValidators: true }
             );
-            if (!updatedStudent) return res.status(404).json({ message: "Student not found" });
+            // File Handling Area
+            if (req.file) {
+                updatedStudent.image = req.file.path
+                await updatedStudent.save(); // Save the document with the updated image
+            }
+            if (!updatedStudent) {
+                return res.status(404).json({ message: "Student not found" });
+            }
             res.status(200).json({ message: "Student updated successfully", data: updatedStudent });
         } catch (error) {
             const statusCode = error.name === 'ValidationError' ? 400 : 500;
@@ -76,7 +90,7 @@ class allcontroller {
         try {
             const deletedStudent = await Student.findByIdAndDelete(id);
             res.status(deletedStudent ? 200 : 404).json(
-                deletedStudent ? { message: "Student deleted successfully" } : { message: "Student not found" }
+                deletedStudent ? { message: "Student deleted successfully", delete: deletedStudent } : { message: "Student not found" }
             );
         } catch (error) {
             console.error(error);
@@ -90,4 +104,4 @@ class allcontroller {
 }
 
 
-module.exports = new allcontroller()
+module.exports = new studentcontroller()

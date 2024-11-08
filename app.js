@@ -10,9 +10,12 @@ connectDB()
 app.use(express.json()); // use Express
 app.use((cors())); // Use Cors 
 
-//Mother API Routing 
-const allrouter = require('./app/router/allrouter');
-app.use('/api', allrouter);
+// Make uploads file static
+app.use('/uploads', express.static(__dirname + '/uploads'));
+
+// Student API Mother Routing 
+const studentapirouter = require('./app/router/apirouter/studentrouter.js');
+app.use('/api', studentapirouter);
 
 const port = 3004
 app.listen(port, () => {
