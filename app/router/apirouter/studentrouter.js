@@ -1,6 +1,6 @@
 const express = require('express')
 const studentcontroller = require('../../controller/apicontroller/studentcontroller')
-const uploadImage = require('../../helper/studentimage') // Image handle Area
+const uploadImage = require('../../helper/imagehandler') // Image handle Area
 const router = express.Router()
 
 router.post('/create', uploadImage.single('image'), studentcontroller.create) // Create API 
