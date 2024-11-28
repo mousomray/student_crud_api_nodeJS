@@ -1,4 +1,6 @@
 const Student = require('../../model/student');
+const path = require('path');
+const fs = require('fs');
 
 class studentcontroller {
 
@@ -61,6 +63,23 @@ class studentcontroller {
     // Update Data
     async studentupdate(req, res) {
         const id = req.params.id;
+        // Deleting image from uploads folder start
+        if (req.file) {
+            const student = await Student.findById(id);
+            const imagePath = path.resolve(__dirname, '../../../', student.image);
+            if (fs.existsSync(imagePath)) {
+                fs.unlink(imagePath, (err) => {
+                    if (err) {
+                        console.error('Error deleting image file:', err);
+                    } else {
+                        console.log('Image file deleted successfully:', student.image);
+                    }
+                });
+            } else {
+                console.log('File does not exist:', imagePath);
+            }
+        }
+        // Deleting image from uploads folder end
         try {
             const updatedStudent = await Student.findByIdAndUpdate(id, req.body, { new: true, runValidators: true }
             );
@@ -87,20 +106,31 @@ class studentcontroller {
     // Delete Student
     async studentdelete(req, res) {
         const id = req.params.id;
+        // Deleting image from uploads folder start
+        const student = await Student.findById(id);
+        const imagePath = path.resolve(__dirname, '../../../', student.image);
+        if (fs.existsSync(imagePath)) {
+            fs.unlink(imagePath, (err) => {
+                if (err) {
+                    console.error('Error deleting image file:', err);
+                } else {
+                    console.log('Image file deleted successfully:', student.image);
+                }
+            });
+        } else {
+            console.log('File does not exist:', imagePath);
+        }
+        // Deleting image from uploads folder end
         try {
             const deletedStudent = await Student.findByIdAndDelete(id);
             res.status(deletedStudent ? 200 : 404).json(
-                deletedStudent ? { message: "Student deleted successfully", delete: deletedStudent } : { message: "Student not found" }
+                deletedStudent ? { message: "Student deleted successfully" } : { message: "Student not found" }
             );
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Error deleting student" });
         }
     }
-
-
-
-
 }
 
 
