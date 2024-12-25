@@ -29,20 +29,47 @@ class studentcontroller {
     }
 
 
-    // Get API 
+    // Fetch student without pagination 
+    // async getall(req, res) {
+    //     try {
+    //         const data = await Student.find()
+    //         res.status(200).json({
+    //             message: "Student get successfully",
+    //             total: data.length,
+    //             students: data
+    //         })
+    //     } catch (error) {
+    //         console.log(error);
+    //         res.status(500).json({ message: "Error retrieving student data" });
+    //     }
+    // }
+
+    // Fetch student using pagination
     async getall(req, res) {
         try {
-            const data = await Student.find()
+            const page = parseInt(req.query.page) || 1
+            const limit = 3
+            const totaldata = await Student.countDocuments()
+            const totalpage = Math.ceil(totaldata / limit)
+            const nextpage = totalpage > page ? page + 1 : null
+            const prevpage = page > 1 ? page - 1 : null
+            const data = await Student.find().skip((page - 1) * limit).limit(limit)
             res.status(200).json({
-                message: "Student get successfully",
-                total: data.length,
-                students: data
+                message: "Data get sucessfully",
+                data: data,
+                pagination: {
+                    page,
+                    prevpage,
+                    nextpage,
+                    totalpage,
+                    totaldata
+                }
             })
         } catch (error) {
-            console.log(error);
-            res.status(500).json({ message: "Error retrieving student data" });
+            console.log("Error get data...", error);
         }
     }
+
 
     // Get Single 
     async getsingle(req, res) {
@@ -129,6 +156,29 @@ class studentcontroller {
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Error deleting student" });
+        }
+    }
+
+    // Search using post data not query params
+    async search(req, res) {
+        try {
+            let query = {}
+            const search = req.body.search
+            if (req.body.search) {
+                query = {
+                    $or: [
+                        { name: { $regex: search, $options: 'i' } },
+                        { email: { $regex: search, $options: 'i' } },
+                    ]
+                }
+            }
+            const data = await Student.find(query)
+            res.status(200).json({
+                message: "Data get sucessfully",
+                data: data
+            })
+        } catch (error) {
+            console.log("Error get data", error);
         }
     }
 }

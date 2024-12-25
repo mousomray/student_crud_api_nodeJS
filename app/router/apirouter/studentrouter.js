@@ -8,5 +8,6 @@ router.get('/studentlist', studentcontroller.getall) // Get API
 router.get('/singlestudent/:id', studentcontroller.getsingle) // Get Single API
 router.put('/edit/:id', uploadImage.single('image'), studentcontroller.studentupdate) // Edit Data 
 router.delete('/delete/:id', studentcontroller.studentdelete) // Delete Data 
+router.post('/student/search',studentcontroller.search) // Search student
 
 module.exports = router
