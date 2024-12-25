@@ -159,6 +159,29 @@ class studentcontroller {
         }
     }
 
+    // Search API for filtering products by Brand
+    async searchQuery(req, res) {
+        const { name, email } = req.query;
+        const filter = {};
+        if (name) {
+            filter.name = { $regex: new RegExp(name, 'i') }; 
+        }
+        if (email) {
+            filter.email = { $regex: new RegExp(email, 'i') }; 
+        }
+        try {
+            const students = await Student.find(filter);
+            res.status(200).json({
+                message: "Search student retrieving successfully",
+                total: students.length,
+                students: students
+            });
+        } catch (error) {
+            console.error("Error retrieving search students:", error);
+            res.status(500).json({ message: "Error retrieving students" });
+        }
+    }
+
     // Search using post data not query params
     async search(req, res) {
         try {
